@@ -5,6 +5,7 @@ import signal
 import threading
 import serial
 from snowboy import snowboydecoder
+import subprocess
 
 MODEL = "model/jarvis.umdl"
 SENSITIVITY = 0.5
@@ -18,6 +19,11 @@ CMD2 = "$led turn_off\n"
 def send_cmd1_and_schedule_cmd2():
     """Send CMD1 immediately, then schedule CMD2 2s later."""
     try:
+        threading.Thread(
+            target=subprocess.run,
+            args=(["afplay", "t2v/output_male.wav"],),
+            daemon=True
+        ).start()
         ser.write(CMD1.encode("utf-8"))
         print(f"➡️ Sent: {CMD1.strip()}")
         # schedule CMD2 in 2 seconds without blocking
