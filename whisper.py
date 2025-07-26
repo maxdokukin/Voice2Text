@@ -17,15 +17,17 @@ from sys import platform
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", default="base", help="Model to use",
-                        choices=["tiny", "base", "small", "medium", "large"])
-    parser.add_argument("--non_english", default=False, action='store_true',
+    parser.add_argument("--model", default="tiny", help="Model to use",
+                        choices=["tiny", "base", "small", "medium", "large", "turbo"])
+    parser.add_argument("--non_english", default=True, action='store_true',
                         help="Don't use the english model.")
     parser.add_argument("--energy_threshold", default=1000,
                         help="Energy level for mic to detect.", type=int)
-    parser.add_argument("--record_timeout", default=2,
+    # <<< lowered from 2s to 0.5s for quicker chunks
+    parser.add_argument("--record_timeout", default=1,
                         help="How real time the recording is in seconds.", type=float)
-    parser.add_argument("--phrase_timeout", default=3,
+    # <<< lowered from 3s to 1s to detect new phrases faster
+    parser.add_argument("--phrase_timeout", default=1.0,
                         help="How much empty space between recordings before we "
                              "consider it a new line in the transcription.", type=float)
     if 'linux' in platform:
@@ -138,8 +140,8 @@ def main():
                 # Flush stdout.
                 print('', end='', flush=True)
             else:
-                # Infinite loops are bad for processors, must sleep.
-                sleep(0.25)
+                # check more frequently for new audio
+                sleep(0.1)
         except KeyboardInterrupt:
             break
 
